@@ -1,0 +1,13 @@
+{
+  "name": "pixel-labs",
+  "owner": {
+    "name": "Mohammad Shehadeh"
+  },
+  "plugins": [
+    {
+      "name": "pixel-labs",
+      "source": "./",
+      "description": "House coding conventions: rules, skills, commands, and a convention-reviewer agent"
+    }
+  ]
+}

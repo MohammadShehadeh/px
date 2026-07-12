@@ -1,0 +1,8 @@
+{
+  "name": "pixel-labs",
+  "description": "House coding conventions as Claude Code rules, skills, commands, and agents for TypeScript/React/Next.js work",
+  "version": "0.1.0",
+  "author": {
+    "name": "Mohammad Shehadeh"
+  }
+}
