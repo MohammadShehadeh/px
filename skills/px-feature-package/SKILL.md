@@ -1,11 +1,11 @@
 ---
-name: feature-package
+name: px-feature-package
 description: Scaffold or extend a monorepo feature package — workspace packages with wildcard per-file subpath exports and no barrels. Use when creating a new feature package or adding a new area (hooks, actions, services) to an existing one.
 ---
 
 # Feature Package
 
-How a feature workspace package is built. Detail in `${CLAUDE_PLUGIN_ROOT}/rules/structure.md`.
+How a feature workspace package is built. Detail in this skill's [references/structure.md](references/structure.md).
 
 ## Layout
 
@@ -51,7 +51,7 @@ Consumers import the defining file: `import { useUploadFile } from '@feature/upl
 ## House patterns inside the package
 
 - UI primitives come from the shared UI package — the feature composes, never redefines base UI.
-- No hardcoded user-facing strings: content copy through the shared i18n package with dot-namespaced keys; failures as SCREAMING_SNAKE `ErrorKey` literals from `constants/error-keys.ts`, resolved to copy at render time (see `${CLAUDE_PLUGIN_ROOT}/rules/errors.md`).
+- No hardcoded user-facing strings: content copy through the shared i18n package with dot-namespaced keys; failures as SCREAMING_SNAKE `ErrorKey` literals from `constants/error-keys.ts`, resolved to copy at render time (`px-conventions` skill: `errors` rule).
 - Extensible systems (dynamic forms, pluggable renderers) use the registry pattern: definition objects → Map-backed registry → factory → type-to-component renderer.
 - Cross-cutting API concerns via higher-order wrappers: `export const POST = withAuth(handleCreateOrder)`.
-- Everything else per the `code-conventions` skill.
+- Everything else per the `px-conventions` skill.

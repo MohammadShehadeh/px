@@ -1,44 +1,56 @@
-# pixel-labs
+# px
 
-My coding conventions packaged for Claude Code — rules, skills, commands, and an agent, extracted from real production TypeScript/React/Next.js codebases I've written.
+My coding conventions packaged for Claude Code — self-contained `px-*` skills, thin commands, and a reviewer agent, extracted from real production TypeScript/React/Next.js codebases I've written.
 
 ## What's inside
 
 ```text
-rules/        Canonical convention docs (readable standalone, referenced by everything else)
-  core-principles   How to work: plan first, be concise, simplest code that works
-  naming            kebab-case files, is/has/should booleans, handle*/on*, no barrels
-  typescript        interface vs type, status unions, derive-don't-restate, Array<T>
-  components        Named arrow-const components, compound flat exports, flat trees
-  hooks-state       Object-returning hooks, one status union, safe context
-  forms             RHF + zod logic, Field/FieldGroup markup, control chooser
-  nextjs            Server-first, leaf client boundaries, metadata factories
-  styling           Tailwind v4 + cn(), semantic tokens, variants, a11y
-  ui-composition    shadcn/ui composition API, overlay chooser, a11y invariants
-  icons             Direct imports, component objects, no sizing classes inside components
-  services          Service layer, DTO mapping, zod at boundaries, fetch timeouts/keepalive
-  optimistic-ui     useOptimistic + useTransition overlay, debounce + reconcile
-  errors            SCREAMING error keys, guard clauses, 'Error in <fn>::' logging
-  structure         Feature packages, wildcard per-file exports, no barrels
-  testing           Colocated Vitest on pure logic, formatter/linter gates
+skills/       Self-contained skills — each installs standalone into any repo
+  px-conventions/
+    SKILL.md             Condensed cheat sheet of the house style — triggers on any TS/React work
+    references/          The full rules, one topic per file:
+      core-principles      How to work: plan first, be concise, simplest code that works
+      naming               kebab-case files, is/has/should booleans, handle*/on*, no barrels
+      typescript           interface vs type, status unions, derive-don't-restate, Array<T>
+      components           Named arrow-const components, compound flat exports, flat trees
+      hooks-state          Object-returning hooks, one status union, safe context
+      forms                RHF + zod logic, Field/FieldGroup markup, control chooser
+      nextjs               Server-first, leaf client boundaries, metadata factories
+      styling              Tailwind v4 + cn(), semantic tokens, variants, a11y
+      ui-composition       shadcn/ui composition API, overlay chooser, a11y invariants
+      icons                Direct imports, component objects, no sizing classes inside components
+      services             Service layer, DTO mapping, zod at boundaries, fetch timeouts/keepalive
+      optimistic-ui        useOptimistic + useTransition overlay, debounce + reconcile
+      errors               SCREAMING error keys, guard clauses, 'Error in <fn>::' logging
+      structure            Feature packages, wildcard per-file exports, no barrels
+      testing              Colocated Vitest on pure logic, formatter/linter gates
+      review-checklist     Canonical review list — shared by the command and the agent
+  px-debug/              Localize top-down, trace references to the root cause, check blast radius
+  px-nextjs-page/        Build a page/landing section the house way (+ references/nextjs.md)
+  px-feature-package/    Scaffold a monorepo feature package (+ references/structure.md)
 
-skills/       Model-invoked knowledge
-  code-conventions     Condensed cheat sheet of all rules — triggers on any TS/React work
-  feature-package      How to scaffold a monorepo feature package
-  nextjs-page          How to build a page/landing section the house way
-  debug                Localize top-down, trace references to the root cause, check blast radius
-
-commands/     Slash commands
-  /plan                Restate task as verifiable targets, confirm before coding
-  /new-component       Create a component through the conventions checklist
-  /new-feature         Scaffold a feature package
-  /check-conventions   Review the current diff against the rules
+commands/     Slash commands over the skills
+  /plan-task             Restate task as verifiable targets, confirm before coding
+  /new-component         Design and build a component: role & states → props API →
+                         server/client → build → verify
+  /new-feature           Plan and build a feature end to end: user journey & business
+                         logic → atomic UI decomposition (page → section → primitive) →
+                         state/communication map → home (route folder vs package) →
+                         structure → boundaries → no premature abstraction → verify
+  /review-conventions    Review the current diff against review-checklist.md
 
 agents/       Subagents
-  convention-reviewer  Ranked violation report for a diff or files
+  conventions-reviewer   Ranked violation report for a diff or files (reads review-checklist.md)
 
-templates/    CLAUDE.md template that @-imports the rules into a project
+templates/    Slim CLAUDE.md template for projects (skills carry the rules; @-imports as fallback)
 ```
+
+### Naming scheme
+
+- **Skills** are `px-` + noun (`px-conventions`, `px-debug`) — collision-proof when installed standalone, self-contained with their own `references/`.
+- **Commands** are verb-first imperatives (`/new-component`, `/review-conventions`). They lean on the skills for the rules; `/new-feature` additionally carries the end-to-end build workflow.
+- **One word per concept**: "conventions" (plural) and "review" everywhere — skill `px-conventions`, command `/review-conventions`, agent `conventions-reviewer`, reference `review-checklist.md`.
+- `px-nextjs-page` and `px-feature-package` carry a copy of the one rule file they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`.
 
 ## Install
 
@@ -46,21 +58,25 @@ templates/    CLAUDE.md template that @-imports the rules into a project
 
 ```text
 /plugin marketplace add <path-or-git-url-to-this-repo>
-/plugin install pixel-labs
+/plugin install px
 ```
 
-**Personal, everywhere** — copy pieces into `~/.claude/`:
+**Skills only, anywhere** — each skill directory is self-contained (Agent Skills format). Copy any of them into `~/.claude/skills/` (personal) or a repo's `.claude/skills/` (per project):
 
 ```text
-commands/*.md  →  ~/.claude/commands/
-agents/*.md    →  ~/.claude/agents/
-skills/*       →  ~/.claude/skills/
+skills/px-conventions/     →  .claude/skills/px-conventions/
+skills/px-debug/           →  .claude/skills/px-debug/
+...
 ```
 
-> The skills and agent reference the rules via `${CLAUDE_PLUGIN_ROOT}`, which only exists when installed as a plugin — if you copy them out, copy `rules/` somewhere too and replace those references with its real path.
+**Commands & agent** require the plugin install — they resolve the checklist via `${CLAUDE_PLUGIN_ROOT}`. If you copy them out instead, replace that variable with the real path to `skills/px-conventions/`.
 
-**Per project (rules only)** — copy `rules/` into the repo and use `templates/CLAUDE.md` as the project's `CLAUDE.md`, or paste the relevant rule files into an existing one.
+**Per project (no skills at all)** — copy `skills/px-conventions/references/` into the repo as `rules/` and use `templates/CLAUDE.md` with its fallback @-imports uncommented.
 
 ## The style in one paragraph
 
 Named arrow-const components with no default exports and no barrel files; kebab-case filenames; props as `<Component>Props` interfaces; one `status` union per async flow (booleans derived, never stored); **flat component trees** (page → section → primitive, no prop drilling); Tailwind v4 through `cn()` with semantic tokens and the variant → token → wrapper customization ladder; **full composition APIs over raw markup** (Field/FieldGroup forms, Group wrappers, direct icon imports as component objects); server-first Next.js with client boundaries pushed to leaf re-export files; every external system behind a service that maps DTOs and returns `{ ok, data | errorKey }`; optimistic UI on `useOptimistic` + `useTransition`, reconciled by the API response, never a forked copy; **errors are typed SCREAMING_SNAKE codes, never sentences**; guard clauses over conditional mazes; plan before coding, simplest code that works, surgical diffs only.
+
+## License
+
+MIT © Mohammad Shehadeh — see [LICENSE.md](LICENSE.md).

@@ -1,11 +1,11 @@
 ---
-name: code-conventions
+name: px-conventions
 description: House TypeScript/React coding conventions. Use whenever writing or reviewing TypeScript, React, or Next.js code — components, hooks, services, types, styling — so output matches the house style.
 ---
 
 # Code Conventions
 
-Condensed house style. Full rules with examples live in `${CLAUDE_PLUGIN_ROOT}/rules/` — read the topic file when detail is needed:
+Condensed house style. Full rules with examples live in this skill's `references/` directory — read the topic file when detail is needed:
 `core-principles` · `naming` · `typescript` · `components` · `hooks-state` · `forms` · `nextjs` · `styling` · `ui-composition` · `icons` · `services` · `optimistic-ui` · `errors` · `structure` · `testing`
 
 ## Cheat sheet
@@ -30,8 +30,8 @@ Condensed house style. Full rules with examples live in `${CLAUDE_PLUGIN_ROOT}/r
 
 **Next.js** — Server Components by default, `'use client'` at the leaves; centralize client boundaries in re-export files (`motion.tsx`); route groups `(folder)` by domain; thin pages composing named `<Section />` components; metadata via root title template + `createPageMetadata(config)` factories; typed zod-validated `env.ts`.
 
-**Boundaries** — every external call in a service that returns the shared `Result<T>` (`{ ok: true, data } | { ok: false, errorKey }`, defined once in `types/result.ts`) and never throws to the UI; map vendor DTOs to internal shapes at the boundary; zod validation at the boundary; separate decisions (pure, tested) from actions (thin shells). Optimistic UI (only for predictable, low-stakes, reversible writes — never destructive, money/permission, or server-decided actions; those render `isPending` and wait): `useOptimistic` overlay over the server-owned canonical value, kept alive by a transition (debounce awaited *inside* it); the API response reconciles — automatic revert + `errorKey` toast on failure; the machinery lives in one shared hook (`use-optimistic-value`), never inlined per component; pending writes flush on unmount (`keepalive: true` around tab close). Every service fetch sets `AbortSignal.timeout`.
+**Boundaries** — every external call in a service that returns the shared `Result<T, K>` (`{ ok: true, data } | { ok: false, errorKey, meta? }`, defined once in `types/result.ts`, `K` narrowed to the operation's keys) and never throws to the UI; map vendor DTOs to internal shapes at the boundary; zod validation at the boundary; separate decisions (pure, tested) from actions (thin shells). Optimistic UI (only for predictable, low-stakes, reversible writes — never destructive, money/permission, or server-decided actions; those render `isPending` and wait): `useOptimistic` overlay over the server-owned canonical value, kept alive by a transition (debounce awaited *inside* it); the API response reconciles — automatic revert + `errorKey` toast on failure; the machinery lives in one shared hook (`use-optimistic-value`), never inlined per component; pending writes flush on unmount (`keepalive: true` around tab close). Every service fetch sets `AbortSignal.timeout`.
 
-**Errors** — errors are **codes, not sentences**: services return a SCREAMING_SNAKE `errorKey` literal from the string-literal `ErrorKey` union (prefix-namespaced: `UPLOAD_FILE_TOO_LARGE`); the frontend resolves copy at render time (``t(`errors.${errorKey}`)`` or an exhaustive `Record<ErrorKey, string>`). Guard clauses + early returns, no `else` mazes; try/catch at I/O with `console.error('Error in <fn>::', error)`; raw error details stop at the log.
+**Errors** — errors are **codes, not sentences**: services return a SCREAMING_SNAKE `errorKey` literal from the string-literal `ErrorKey` union — shared keys are transport/session only (`NETWORK`, `TIMEOUT`, `UNAUTHORIZED`, `RATE_LIMITED`), everything else feature-prefixed, **named by reason when known** (`INVOICE_NOT_FOUND`), the operation catch-all (`INVOICE_FETCH_FAILED`) only when the reason is unknown — no `_FAILED` on reason keys. `Result<T, K>` narrows per operation so a foreign key is a type error; map once via shared helpers (`toErrorKey`: HTTP status → shared keys; `toCaughtErrorKey`: `TimeoutError` → `TIMEOUT` vs `NETWORK`); optional `meta` for interpolation values only. The frontend resolves copy at render time (``t(`errors.${errorKey}`, meta)`` or an exhaustive `Record<ErrorKey, string>`). Guard clauses + early returns, no `else` mazes; try/catch at I/O with `console.error('Error in <fn>::', error)`; raw error details stop at the log.
 
 **Structure** — feature packages with wildcard per-file `package.json` exports (`"./hooks/*"`), `"type": "module"`, `"sideEffects": false`; feature-colocated route folders; Vitest tests colocated, targeting pure logic.

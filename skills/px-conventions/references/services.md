@@ -13,13 +13,17 @@
 - Every external call lives in a **service function** (`services/`, `actions/`) that returns a **normalized, UI-shaped `Result` and never throws to the UI**. Failures are error keys (see [errors.md](errors.md)):
 
 ```ts
-// types/result.ts — defined once per repo, imported everywhere
-export type Result<T> = { ok: true; data: T } | { ok: false; errorKey: ErrorKey };
+// types/result.ts — defined once per repo, imported everywhere; K narrows to the keys
+// the operation can actually produce (see errors.md)
+export type Result<T, K extends ErrorKey = ErrorKey> =
+  | { ok: true; data: T }
+  | { ok: false; errorKey: K; meta?: Record<string, string | number> };
 
 // services/contact.ts
 import type { Result } from '@/types/result';
+import { toCaughtErrorKey, toErrorKey } from '@/lib/error-keys';
 
-export const submitContactMessage = async (payload: ContactFormPayload): Promise<Result<null>> => {
+export const submitContactMessage = async (payload: ContactFormPayload): Promise<Result<null, ContactErrorKey>> => {
   try {
     const response = await fetch(`${env.API_BASE_URL}/contact`, {
       method: 'POST',
@@ -27,11 +31,11 @@ export const submitContactMessage = async (payload: ContactFormPayload): Promise
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(10_000),
     });
-    if (!response.ok) return { ok: false, errorKey: 'CONTACT_SUBMIT_FAILED' };
+    if (!response.ok) return { ok: false, errorKey: toErrorKey(response, 'CONTACT_SUBMIT_FAILED') };
     return { ok: true, data: null };
   } catch (error) {
     console.error('Error in submitContactMessage::', error);
-    return { ok: false, errorKey: 'NETWORK' };
+    return { ok: false, errorKey: toCaughtErrorKey(error) };
   }
 };
 ```
@@ -66,7 +70,7 @@ export const POST = withAuth(handleCreateOrder); // auth + validation before del
 
 ## Fetch hygiene
 
-- **Every service fetch gets a timeout**: `signal: AbortSignal.timeout(10_000)` — a hung request becomes a caught `TimeoutError` that flows into the `errorKey` path instead of an infinite spinner. When a caller signal exists, combine: `AbortSignal.any([callerSignal, AbortSignal.timeout(ms)])`.
+- **Every service fetch gets a timeout**: `signal: AbortSignal.timeout(10_000)` — a hung request becomes a caught `TimeoutError` that `toCaughtErrorKey` maps to `TIMEOUT` (vs `NETWORK` for a dead connection) instead of an infinite spinner. When a caller signal exists, combine: `AbortSignal.any([callerSignal, AbortSignal.timeout(ms)])`.
 - **Writes that may fire around page exit use `keepalive: true`** — flushing a pending debounced save, "mark as read", analytics. The browser finishes the request after the tab closes. Constraints: the body is capped (~64 KiB) and the response is effectively fire-and-forget — never use it for reads.
 
 ## Separate decisions from actions

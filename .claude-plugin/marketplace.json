@@ -1,13 +1,16 @@
 {
-  "name": "pixel-labs",
+  "name": "px",
   "owner": {
     "name": "Mohammad Shehadeh"
   },
+  "metadata": {
+    "description": "House TypeScript/React/Next.js conventions as self-contained px-* skills, commands, and a conventions-reviewer agent."
+  },
   "plugins": [
     {
-      "name": "pixel-labs",
+      "name": "px",
       "source": "./",
-      "description": "House coding conventions: rules, skills, commands, and a convention-reviewer agent"
+      "description": "House coding conventions: self-contained px-* skills, commands, and a conventions-reviewer agent"
     }
   ]
 }
