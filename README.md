@@ -58,7 +58,7 @@ templates/    Slim CLAUDE.md template for projects (skills carry the rules; @-im
 
 ```text
 /plugin marketplace add MohammadShehadeh/px
-/plugin install px@px
+/plugin install px
 ```
 
 **Skills only, anywhere** — each skill directory is self-contained (Agent Skills format). Copy any of them into `~/.claude/skills/` (personal) or a repo's `.claude/skills/` (per project):
