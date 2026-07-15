@@ -17,3 +17,4 @@ How to work, before any code is written.
 - **Name the business meaning, not the technical accident.** `isEligibleForRenewal`, not `checkFlag2`.
 - **Separate decisions from actions.** Pure functions decide; thin imperative shells act. Decision logic should be testable without mocking I/O.
 - **Make errors useful to the next person.** An error message should say what failed, where, and with what input — see [errors.md](errors.md).
+- **Single source of truth.** Do not introduce duplicated state, configuration, or mappings that require updating multiple files for the same change. Prefer deriving values dynamically from existing sources over maintaining manual synchronization points.
