@@ -18,6 +18,7 @@ skills/       Self-contained skills — each installs standalone into any repo
       nextjs               Server-first, leaf client boundaries, metadata factories
       styling              Tailwind v4 + cn(), semantic tokens, variants, a11y
       ui-composition       shadcn/ui composition API, overlay chooser, a11y invariants
+      ui-ux                Reuse over inventing, hierarchy & spacing, responsive, full journey states
       icons                Direct imports, component objects, no sizing classes inside components
       services             Service layer, DTO mapping, zod at boundaries, fetch timeouts/keepalive
       optimistic-ui        useOptimistic + useTransition overlay, debounce + reconcile
