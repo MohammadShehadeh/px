@@ -6,7 +6,7 @@ description: House TypeScript/React coding conventions. Use whenever writing or 
 # Code Conventions
 
 Condensed house style. Full rules with examples live in this skill's `references/` directory — read the topic file when detail is needed:
-`core-principles` · `naming` · `typescript` · `components` · `hooks-state` · `forms` · `nextjs` · `styling` · `ui-composition` · `icons` · `services` · `optimistic-ui` · `errors` · `structure` · `testing`
+`core-principles` · `naming` · `typescript` · `components` · `hooks-state` · `forms` · `nextjs` · `styling` · `ui-composition` · `ui-ux` · `icons` · `services` · `optimistic-ui` · `errors` · `structure` · `testing`
 
 ## Cheat sheet
 
@@ -25,6 +25,8 @@ Condensed house style. Full rules with examples live in this skill's `references
 **TypeScript** — `interface` for object shapes, `type` for unions/aliases; string-literal unions or `as const` + `keyof typeof` over enums; derive types (`z.infer`, `ReturnType`, `keyof typeof`) instead of restating; `unknown` over `any`; `Array<T>` over `T[]`; model invalid states out (Draft vs Saved shapes, status unions); JSDoc only where the contract isn't obvious from the signature.
 
 **Styling** — Tailwind v4 only, no inline styles; `cn()` for all class merging; variants as typed lookup maps or CVA (match the repo); semantic tokens (`bg-muted`) never arbitrary hex or raw palette colors; no manual `dark:` overrides (tokens handle themes); customization ladder: variant → `className` for layout only → token → new variant → wrapper; `gap-*` over `space-*`, `size-*` over `w-/h-`, `truncate`; no manual z-index on overlays; hoist repeated class strings to local consts; a11y classes always (`focus-visible:`, `sr-only`, ARIA on icon-only buttons).
+
+**UI/UX** — reuse existing patterns/tokens/components/layouts over inventing new ones; visual hierarchy tracks importance, spacing follows the design system's scale not eyeballed values, alignment is deliberate; responsive behavior is explicit per breakpoint, not incidental; design the full journey — hover/focus/active/disabled states, loading states, error states, success feedback, and deliberate transitions — not just the default/success path.
 
 **UI components** — the component layer is **shadcn/ui** (`components/ui`, added via the shadcn CLI — never hand-written, never another library); use the full composition API (Card = Header/Content/Footer; items inside their Group; `TabsTrigger` inside `TabsList`); existing primitives over custom markup (`Separator`, `Skeleton`, `Badge`, `Alert`); Dialog/Sheet/Drawer always get a Title (`sr-only` ok); `Avatar` always has `AvatarFallback`. Forms markup via `FieldGroup`/`Field` (+ `FieldSet`/`FieldLegend` for groups), `InputGroup` + `InputGroupAddon` for buttons-in-inputs, `ToggleGroup` for 2–7 option sets — never raw divs with `space-y-*`. Icons: import directly from the project's icon library, pass component objects not string keys, no sizing classes on icons inside components.
 
