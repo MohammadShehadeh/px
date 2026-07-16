@@ -9,6 +9,7 @@ export const SubmitButton = ({ label, onSubmit }: SubmitButtonProps) => { ... };
 const StatItem = ({ value, label }: { value: string; label: string }) => ( ... );
 ```
 
+- **Props model only what the component reads.** Don't accept a whole entity to use two fields — declare those two, or derive with `Pick<User, 'id' | 'name'>`. A fat props interface couples the component to data it never touches.
 - `children` is `React.ReactNode` in the props interface, or `PropsWithChildren` for simple wrappers.
 - `'use client'` / `'use server'` is always the first line of the file when needed.
 - **Compound components as flat named exports from one file** (shadcn style — `Card`/`CardHeader`, never `Card.Header`). No namespaced statics: attaching parts as properties drags every part into every import and defeats tree-shaking:
