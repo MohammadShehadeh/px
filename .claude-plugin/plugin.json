@@ -1,7 +1,7 @@
 {
   "name": "px",
-  "description": "House coding conventions as self-contained px-* skills, commands, and a reviewer agent for TypeScript/React/Next.js work",
-  "version": "0.3.0",
+  "description": "House coding conventions as self-contained px-* skills, commands, and a reviewer agent for TypeScript/React/Next.js — adapt to each repo's layout and toolchain",
+  "version": "0.4.0",
   "license": "MIT",
   "author": {
     "name": "Mohammad Shehadeh"

@@ -38,8 +38,8 @@ For every piece of state the journey needs, decide before coding:
 
 ## 4. Pick the feature's home
 
-- **Default: feature-colocated route folder** — the route owns its `components/`, `hooks/`, `lib/`, `store/`, `constants/`, colocated tests. Only cross-feature code is hoisted.
-- **Monorepo feature package only when** the feature is shared by 2+ apps or genuinely versionable on its own — then follow the `px-feature-package` skill as the blueprint.
+- **Default: feature-colocated module** — route folder or `features/<name>/` (whichever the repo uses) owns `components/`, `hooks/`, `lib/`, `constants/`, colocated tests. Only cross-feature code is hoisted.
+- **Shared package only when** the feature is consumed by 2+ apps or must be versioned independently — then follow the `px-feature` skill as the blueprint.
 - Never manufacture a package for one consumer.
 
 ## 5. Structure — organized by responsibility

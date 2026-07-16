@@ -55,4 +55,4 @@ Not optional: `focus-visible:ring-2`, `sr-only`, `aria-hidden` on decorative ele
 
 ## Primitives over custom markup
 
-**The base UI layer is shadcn/ui** (`components/ui` or the monorepo UI package, added via the shadcn CLI). Features never define base UI primitives — they compose the shadcn ones. See [ui-composition.md](ui-composition.md) for composition rules.
+**The base UI layer is shadcn/ui** when the project uses it (`components/ui` or a shared UI package, added via the shadcn CLI). Features never define base UI primitives — they compose the project's existing ones. See [ui-composition.md](ui-composition.md) for composition rules.

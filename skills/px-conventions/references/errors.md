@@ -4,7 +4,7 @@
 
 ## Error keys
 
-- Keys are **string-literal unions** — the union is the source of truth and the value is the name; no const object, no second spelling to keep in sync. **Shared keys are transport/session-level only** (`NETWORK`, `TIMEOUT`, `UNAUTHORIZED`, `RATE_LIMITED`); everything else is feature-prefixed, and the app-wide union composes the per-feature unions (single app: one module with a section per feature; monorepo: each feature package owns its union in `constants/error-keys.ts`):
+- Keys are **string-literal unions** — the union is the source of truth and the value is the name; no const object, no second spelling to keep in sync. **Shared keys are transport/session-level only** (`NETWORK`, `TIMEOUT`, `UNAUTHORIZED`, `RATE_LIMITED`); everything else is feature-prefixed. Compose the app-wide union from per-feature sections — one module in a single app, or per-feature `constants/error-keys.ts` when features are packaged:
 
 ```ts
 // constants/error-keys.ts

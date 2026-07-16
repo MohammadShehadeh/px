@@ -1,6 +1,6 @@
 # UI Composition
 
-**The component layer is [shadcn/ui](https://ui.shadcn.com).** Base UI lives in `components/ui`, added via the CLI (`npx shadcn@latest add <component>`) — never hand-written and never replaced with another component library. Features compose these primitives; these rules are about *how* to compose them. For version-specific APIs, consult the current shadcn docs/skill rather than memory. (Form markup lives in [forms.md](forms.md); icon rules in [icons.md](icons.md).)
+**The component layer is [shadcn/ui](https://ui.shadcn.com) when the project uses it.** Base UI lives in `components/ui` (or the repo's shared UI package), added via the CLI (`npx shadcn@latest add <component>`) — never hand-written and never replaced with another library unless the repo already chose one. Features compose these primitives; these rules are about *how* to compose them. For version-specific APIs, consult the current shadcn docs/skill rather than memory. (Form markup lives in [forms.md](forms.md); icon rules in [icons.md](icons.md).)
 
 ## Use the full composition API
 

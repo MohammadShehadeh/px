@@ -19,7 +19,7 @@ export type Result<T, K extends ErrorKey = ErrorKey> =
   | { ok: true; data: T }
   | { ok: false; errorKey: K; meta?: Record<string, string | number> };
 
-// services/contact.ts
+// services/contact.ts — paths use the project's alias convention
 import type { Result } from '@/types/result';
 import { toCaughtErrorKey, toErrorKey } from '@/lib/error-keys';
 

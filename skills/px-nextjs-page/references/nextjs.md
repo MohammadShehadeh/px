@@ -11,24 +11,22 @@
 ## Routing & page composition
 
 - **Route groups `(folder)` organize by domain** without affecting URLs — `(marketing)`, `(dashboard)`, `(content)` — each with its own `layout.tsx`.
-- **Pages are thin server components that compose named section components**, each section wrapped in a semantic container:
+- **Pages are thin server components that compose named section components** — semantic `<section>` (or the project's layout wrapper) per block; no business logic in the page file:
 
 ```tsx
 export default function Home() {
   return (
     <>
-      <Container gutter="sm" asChild>
-        <section><Hero /></section>
-      </Container>
-      <Container gutter="md" asChild>
-        <section><WhatIDo /></section>
-      </Container>
+      <section><Hero /></section>
+      <section><WhatIDo /></section>
     </>
   );
 }
 ```
 
-- **Feature-colocated sub-apps**: a self-contained route folder holds its own `components/`, `lib/`, `store/`, `hooks/`, `constants/`, plus colocated `*.test.ts`. Only cross-feature code goes to top-level `src/components` / `src/lib` / `src/hooks`.
+Use the repo's layout/container component when one exists — do not introduce a parallel wrapper pattern.
+
+- **Feature-colocated modules**: a self-contained route folder (or `features/<name>/`) holds its own `components/`, `lib/`, `hooks/`, `constants/`, plus colocated `*.test.ts`. Only cross-feature code goes to top-level shared folders.
 - Use the framework's file conventions (`not-found.tsx`, `global-error.tsx`, `sitemap.ts`, `manifest.json`, `robots.txt`, route handlers) instead of hand-rolling.
 
 ## Metadata & SEO
@@ -38,7 +36,7 @@ export default function Home() {
 - **Repetitive metadata goes through a factory** — one config object per route, not copy-pasted metadata blocks:
 
 ```ts
-// lib/page-metadata.ts
+// lib/page-metadata.ts (path follows the repo)
 interface PageMetaConfig {
   title: string;
   description: string;
@@ -63,10 +61,10 @@ export const createPageMetadata = ({ title, description, path }: PageMetaConfig)
 />
 ```
 
-- `sitemap.ts` is generated from the same typed `src/data/navigation` arrays the nav uses — one source of truth.
+- **`sitemap.ts` and nav share one typed routes config** — a single source of truth module (wherever the repo keeps site structure); both derive from it.
 
 ## Data & env
 
-- Static content lives in typed `src/data/*` modules (`Array<NavigationItem>`); use `.tsx` data files when entries embed JSX/icons.
-- Env vars are typed and validated with zod (`@t3-oss/env-nextjs` style, `src/env.ts`) — never raw `process.env` reads scattered across files.
-- Path aliases: `@/*` → `src/*`.
+- Static content lives in typed data modules (`Array<NavigationItem>` or equivalent); use `.tsx` data files when entries embed JSX/icons.
+- Env vars are typed and validated with zod (e.g. `@t3-oss/env-nextjs`, single `env.ts`) — never raw `process.env` reads scattered across files.
+- Use the project's path aliases (`@/*` or equivalent) — do not add a second alias scheme.

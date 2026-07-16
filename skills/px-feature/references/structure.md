@@ -1,3 +1,5 @@
+<!-- Copy of skills/px-conventions/references/structure.md so this skill installs standalone — keep in sync. -->
+
 # Project & Feature Structure
 
 ## Adapt to the repo first
@@ -67,4 +69,4 @@ Extensible systems (dynamic forms, plugin-style renderers): plain definition obj
 
 ## App skeleton (Next.js)
 
-Common single-app layout under `src/` (adjust to the repo): `app/`, `components/`, `lib/`, `hooks/`, `constants/`, `services/`, `providers/`, `styles/`, `types/`, typed `env.ts`. Feature-colocated route folders or `features/<name>/` own their slice; only genuinely cross-feature code is hoisted to top-level folders. Details in [nextjs.md](nextjs.md).
+Common single-app layout under `src/` (adjust to the repo): `app/`, `components/`, `lib/`, `hooks/`, `constants/`, `services/`, `providers/`, `styles/`, `types/`, typed `env.ts`. Feature-colocated route folders or `features/<name>/` own their slice; only genuinely cross-feature code is hoisted to top-level folders. Details in `px-conventions` skill: `nextjs` rule.

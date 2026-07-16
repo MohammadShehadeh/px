@@ -2,6 +2,17 @@
 
 How to work, before any code is written.
 
+## Adapt to the repo
+
+These conventions describe a **house style**, not a mandate to reshape every project. Before adding files, packages, or patterns:
+
+- **Read the existing layout** — route colocation vs `src/features/`, where UI primitives live, path aliases, test runner, env validation, i18n.
+- **Match established patterns** when they already follow the spirit of these rules (direct imports, thin pages, service boundaries). Extend; do not parallel-invent.
+- **Prefer the simplest home** for new code — a colocated feature folder beats a new package; a lookup map beats a registry until 3+ variants need it.
+- **Use the project's toolchain** in plans and done criteria (`npm`/`pnpm`/`yarn`, whatever the repo already runs).
+
+When a convention says "match the repo" or "the project's …", that overrides any example path or tool named here.
+
 ## Working style
 
 - **Be concise** in all interactions and commit messages.
