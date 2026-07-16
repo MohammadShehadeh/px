@@ -29,11 +29,15 @@ skills/       Self-contained skills — each installs standalone into any repo
   px-debug/              Localize top-down, trace references to the root cause, check blast radius
   px-nextjs-page/        Build a page/landing section the house way (+ references/nextjs.md)
   px-feature/            Scaffold a feature module — colocated by default, package when shared (+ references/structure.md)
+  px-form/               Build a form — schema first, RHF + zod, Field markup, Result submit (+ references/forms.md)
+  px-service/            Scaffold a service boundary — DTO map, Result, ErrorKey (+ references/services.md, errors.md)
 
 commands/     Slash commands over the skills
   /plan-task             Restate task as verifiable targets, confirm before coding
   /new-component         Design and build a component: role & states → props API →
                          server/client → build → verify
+  /new-form              Schema & error keys → controls → Field markup → RHF → Result submit → verify
+  /new-service           Operation contract → schema → service → action/handler → verify
   /new-feature           Plan and build a feature end to end: user journey & business
                          logic → atomic UI decomposition (page → section → primitive) →
                          state/communication map → home (route vs features/ vs package) →
@@ -51,7 +55,7 @@ templates/    Slim CLAUDE.md template for projects (skills carry the rules; @-im
 - **Skills** are `px-` + noun (`px-conventions`, `px-debug`) — collision-proof when installed standalone, self-contained with their own `references/`.
 - **Commands** are verb-first imperatives (`/new-component`, `/review-conventions`). They lean on the skills for the rules; `/new-feature` additionally carries the end-to-end build workflow.
 - **One word per concept**: "conventions" (plural) and "review" everywhere — skill `px-conventions`, command `/review-conventions`, agent `conventions-reviewer`, reference `review-checklist.md`.
-- `px-nextjs-page` and `px-feature` carry a copy of the one rule file they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`.
+- `px-nextjs-page`, `px-feature`, `px-form`, and `px-service` carry copies of the rule files they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`.
 
 ## Install
 

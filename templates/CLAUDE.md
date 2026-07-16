@@ -11,7 +11,7 @@ session — prefer the skills.
 
 # Code Conventions
 
-House conventions ship as the `px-conventions` skill (with `px-debug`, `px-nextjs-page`, `px-feature` for their workflows). Follow them for all TypeScript/React/Next.js code in this repo.
+House conventions ship as the `px-conventions` skill (with `px-debug`, `px-nextjs-page`, `px-feature`, `px-form`, `px-service` for their workflows). Follow them for all TypeScript/React/Next.js code in this repo.
 
 **Adapt to this repo** — match existing layout, aliases, UI layer, and toolchain before adding new patterns. The skills describe house style, not a mandate to restructure unrelated code.
 

@@ -49,7 +49,7 @@ For every piece of state the journey needs, decide before coding:
 
 ## 6. Boundaries
 
-- **Every external call behind a service** returning the shared `Result<T, K>` (`{ ok: true, data } | { ok: false, errorKey }`, `K` narrowed to this operation's keys) — never throws to the UI. Vendor DTOs mapped to internal shapes and zod-validated at the edge; `AbortSignal.timeout` on every fetch.
+- **Every external call behind a service** returning the shared `Result<T, K>` (`{ ok: true, data } | { ok: false, errorKey }`, `K` narrowed to this operation's keys) — never throws to the UI. Follow the `px-service` skill when scaffolding a new boundary; `px-form` when the feature includes a multi-field form.
 - **Failures are SCREAMING_SNAKE `ErrorKey` literals** from `constants/error-keys.ts`, named by reason when known (`INVOICE_NOT_FOUND`), operation catch-all only when it isn't; copy resolves from the key at render time — no hardcoded user-facing strings anywhere in the feature.
 - The feature composes shared UI primitives — it never redefines base UI, never reads `process.env` directly (typed `env.ts` only).
 
