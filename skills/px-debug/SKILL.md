@@ -1,6 +1,6 @@
 ---
 name: px-debug
-description: House debugging method — localize top-down (page → section → block → component) to the defect site, map references in both directions, trace to the root cause, and account for the blast radius before fixing. Use when investigating a bug, regression, or unexpected behavior in TypeScript/React/Next.js code.
+description: House debugging method — localize top-down (page → section → block → component) to the defect site, map references in both directions, trace to the root cause (interrogating where/why/how to prune candidates for wrong-value bugs), and account for the blast radius before fixing. Use when investigating a bug, regression, or unexpected behavior in TypeScript/React/Next.js code.
 ---
 
 # Debug
@@ -30,6 +30,16 @@ Walk outbound from the defect site toward the data: component → hook → servi
 
 - The greppable log prefix (`'Error in <fn>::'`, `px-conventions`: `errors` rule) tells you which layer produced the bad value.
 - Stop at the first place where correct input becomes wrong output. That is the actual bug; everything downstream is symptom.
+
+### Wrong-value bugs: interrogate where / why / how
+
+A crash hands you a stack trace; a **wrong value** ("the table shows the wrong total") does not — so you prune the candidate set by intent, not by reading every line. At each site on the path from step 2's graph, ask:
+
+- **Where** does this value come from? Every transform between boundary and render is a candidate — the DTO mapper, a `??` default, a cast, a `new Date(...)`, a `.find()`, a cache, an optimistic overlay.
+- **Why** is it shaped this way *here*? Each of those encodes an **assumption** (this field is always present; this string is a parseable date; this list has the row). Name the assumption. The one that doesn't hold for the failing input is the bug.
+- **How** does each consumer use it — as the producer intended? A value correct at its source but read in the wrong unit / shape / timezone by one consumer is a **coupling** bug, not a production bug → carry it to step 4.
+
+Each assumption you *confirm* holds eliminates that site; the one you can't confirm is where to look. That is how the probability space narrows — most branches rule themselves out before you touch code.
 
 ## 4. Blast radius — account before you fix
 

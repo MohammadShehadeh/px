@@ -9,7 +9,7 @@ skills/       Self-contained skills — each installs standalone into any repo
   px-conventions/
     SKILL.md             Condensed cheat sheet of the house style — triggers on any TS/React work
     references/          The full rules, one topic per file:
-      core-principles      How to work: adapt to the repo, plan first, be concise, simplest code that works
+      core-principles      How to work: adapt to the repo, plan by discovering shared layers at scale, be concise, simplest code that works
       naming               kebab-case files, is/has/should booleans, handle*/on*, no barrels
       typescript           interface vs type, status unions, derive-don't-restate, Array<T>
       components           Named arrow-const components, compound flat exports, flat trees
@@ -20,13 +20,14 @@ skills/       Self-contained skills — each installs standalone into any repo
       ui-composition       shadcn/ui composition API, overlay chooser, a11y invariants
       ui-ux                Reuse over inventing, hierarchy & spacing, responsive, full journey states
       icons                Direct imports, component objects, no sizing classes inside components
-      services             Service layer, DTO mapping, zod at boundaries, fetch timeouts/keepalive
+      services             Service layer, one shared http client, DTO mapping, zod at boundaries
+      data                 Parse once at the boundary, format at the edge, server-first search/sort/paginate
       optimistic-ui        useOptimistic + useTransition overlay, debounce + reconcile
       errors               SCREAMING error keys, guard clauses, 'Error in <fn>::' logging
       structure            Feature modules (colocated default), optional packages, no barrels
       testing              Colocated tests on pure logic, match repo toolchain
       review-checklist     Canonical review list — shared by the command and the agent
-  px-debug/              Localize top-down, trace references to the root cause, check blast radius
+  px-debug/              Localize top-down, trace references to the root cause (where/why/how for wrong-value bugs), check blast radius
   px-nextjs-page/        Build a page/landing section the house way (+ references/nextjs.md)
   px-feature/            Scaffold a feature module — colocated by default, package when shared (+ references/structure.md)
   px-form/               Build a form — schema first, RHF + zod, Field markup, Result submit (+ references/forms.md)
@@ -55,7 +56,7 @@ templates/    Slim CLAUDE.md template for projects (skills carry the rules; @-im
 - **Skills** are `px-` + noun (`px-conventions`, `px-debug`) — collision-proof when installed standalone, self-contained with their own `references/`.
 - **Commands** are verb-first imperatives (`/new-component`, `/review-conventions`). They lean on the skills for the rules; `/new-feature` additionally carries the end-to-end build workflow.
 - **One word per concept**: "conventions" (plural) and "review" everywhere — skill `px-conventions`, command `/review-conventions`, agent `conventions-reviewer`, reference `review-checklist.md`.
-- `px-nextjs-page`, `px-feature`, `px-form`, and `px-service` carry copies of the rule files they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`.
+- `px-nextjs-page`, `px-feature`, `px-form`, and `px-service` carry copies of the rule files they need so they install alone; each copy is marked with a keep-in-sync note pointing at the original in `px-conventions/references/`. A copy's prose and cross-skill links may differ from the canonical, but its code blocks must not — `scripts/check-doc-sync.mjs` (run in CI via `.github/workflows/doc-sync.yml`) fails the build if any copy's fenced code drifts from its source.
 
 ## Install
 
@@ -80,7 +81,7 @@ skills/px-debug/           →  .claude/skills/px-debug/
 
 ## The style in one paragraph
 
-Inspect the repo before imposing patterns; named arrow-const components with no default exports and no barrel files; kebab-case filenames; props as `<Component>Props` interfaces; one `status` union per async flow (booleans derived, never stored); **flat component trees** (page → section → primitive, no prop drilling); Tailwind v4 through `cn()` with semantic tokens and the variant → token → wrapper customization ladder; **full composition APIs over raw markup** (Field/FieldGroup forms, Group wrappers, direct icon imports as component objects); server-first Next.js with client boundaries pushed to leaf re-export files; every external system behind a service that maps DTOs and returns `{ ok, data | errorKey }`; optimistic UI on `useOptimistic` + `useTransition`, reconciled by the API response, never a forked copy; **errors are typed SCREAMING_SNAKE codes, never sentences**; guard clauses over conditional mazes; feature modules colocated in the app by default, packages only when shared; plan before coding, simplest code that works, surgical diffs only.
+Inspect the repo before imposing patterns; named arrow-const components with no default exports and no barrel files; kebab-case filenames; props as `<Component>Props` interfaces; one `status` union per async flow (booleans derived, never stored); **flat component trees** (page → section → primitive, no prop drilling); Tailwind v4 through `cn()` with semantic tokens and the variant → token → wrapper customization ladder; **full composition APIs over raw markup** (Field/FieldGroup forms, Group wrappers, direct icon imports as component objects); server-first Next.js with client boundaries pushed to leaf re-export files; every external system behind a service that maps DTOs and returns `{ ok, data | errorKey }`, with one shared `http` client owning base URL, auth, timeout and error mapping so services never re-type `fetch`; wire values parsed to domain types once at the boundary and formatted at the edge, search/sort/paginate server-first; server state in a query cache (TanStack Query) with `refetchInterval`/invalidation for live updates, never `useState`+`fetch` or hand-rolled polling; optimistic UI on `useOptimistic` + `useTransition`, reconciled by the API response, never a forked copy; **errors are typed SCREAMING_SNAKE codes, never sentences**; guard clauses over conditional mazes; feature modules colocated in the app by default, packages only when shared; plan before coding, simplest code that works, surgical diffs only.
 
 ## License
 

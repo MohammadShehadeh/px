@@ -1,5 +1,5 @@
 ---
-description: Scaffold a service or server boundary the house way — operation contract, zod schema, DTO mapping, narrowed Result with ErrorKey, fetch timeouts
+description: Scaffold a service or server boundary the house way — operation contract, zod schema, shared http client, DTO mapping, narrowed Result with ErrorKey
 argument-hint: <operation-name> [external system / endpoint]
 ---
 
@@ -9,7 +9,7 @@ Load the `px-service` skill (and `px-conventions` for structure/testing). Phase 
 
 ## 1. Inspect the repo
 
-Find and reuse: `Result<T, K>`, `toErrorKey` / `toCaughtErrorKey`, typed `env.ts`, existing services in the same feature. Match location and naming — do not parallel-invent.
+Find and reuse: `Result<T, K>`, the shared `http` client (`lib/http.ts`), `toErrorKey` / `toCaughtErrorKey`, typed `env.ts`, existing services in the same feature. Match location and naming — do not parallel-invent.
 
 ## 2. Define the operation contract
 
@@ -26,7 +26,7 @@ Find and reuse: `Result<T, K>`, `toErrorKey` / `toCaughtErrorKey`, typed `env.ts
 ## 3. Build
 
 - **Schema** colocated — same schema can drive form validation later (`px-form`).
-- **Service**: DTO mapping stays inside the file; `AbortSignal.timeout` on every fetch; try/catch with `'Error in <fn>::'`; return `Result`, never throw to UI.
+- **Service**: goes through the shared `http` client (no raw `fetch`/headers/timeout — the client owns those); DTO mapping stays inside the file; return `Result`, never throw to UI. Raw-SDK services (non-HTTP) keep their own try/catch with `'Error in <fn>::'`.
 - **Action/handler** (if needed): thin `'use server'` or route handler — validate, delegate, return plain `Result`.
 - **Error keys** added to feature's `constants/error-keys.ts`.
 - **Tests** on pure mappers in `lib/` — not on fetch wiring.

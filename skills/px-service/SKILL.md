@@ -1,6 +1,6 @@
 ---
 name: px-service
-description: Scaffold a service or server boundary the house way — zod-validated payloads, DTO mapping, narrowed Result with ErrorKey, fetch timeouts, no throws to UI. Use when adding API clients, server actions, route handlers, or external integrations.
+description: Scaffold a service or server boundary the house way — one shared http client, zod-validated payloads, DTO mapping, narrowed Result with ErrorKey, no throws to UI. Use when adding API clients, server actions, route handlers, or external integrations.
 ---
 
 # Service & Boundary
@@ -12,9 +12,10 @@ How to wrap external chaos behind a typed boundary. Full rules in [references/se
 Before creating files, find what already exists:
 
 - `Result<T, K>` type — reuse it; define once if missing (`types/result.ts`)
-- `toErrorKey` / `toCaughtErrorKey` helpers — reuse from `lib/error-keys.ts`
+- Shared `http` client (`lib/http.ts`) — reuse it; the service never calls `fetch` directly. Define once if missing (owns base URL, auth headers, JSON, timeout, status→`errorKey` mapping)
+- `toErrorKey` / `toCaughtErrorKey` helpers — reuse from `lib/error-keys.ts` (the client uses these; a raw-SDK service that can't go through `http` uses them directly)
 - Typed `env.ts` — never read `process.env` in the service
-- Existing services in the same feature — match file location, naming, fetch patterns
+- Existing services in the same feature — match file location, naming, and how they call `http`
 
 ## 2. Define the operation contract
 
@@ -41,36 +42,34 @@ Vendor DTO shapes never leave the service file — map to internal domain types 
 
 ## 4. Service function template
 
-```ts
-// services/contact.ts
-import type { Result } from '@/types/result';
-import { toCaughtErrorKey, toErrorKey } from '@/lib/error-keys';
-import { contactFormSchema, type ContactFormPayload } from '../lib/contact-schema';
+The service goes through the shared `http` client (`lib/http.ts`) — no `fetch`, no headers, no `try/catch`, no timeout in the service. It names the endpoint, narrows the keys, and maps the DTO:
 
-export const submitContactMessage = async (
+```ts
+// services/contact.ts — write with no body payload back
+import type { Result } from '@/types/result';
+import { http } from '@/lib/http';
+import { type ContactFormPayload } from '../lib/contact-schema';
+
+export const submitContactMessage = (
   payload: ContactFormPayload,
-): Promise<Result<null, ContactErrorKey>> => {
-  try {
-    const response = await fetch(`${env.API_BASE_URL}/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (!response.ok) {
-      return { ok: false, errorKey: toErrorKey(response, 'CONTACT_SUBMIT_FAILED') };
-    }
-    return { ok: true, data: null };
-  } catch (error) {
-    console.error('Error in submitContactMessage::', error);
-    return { ok: false, errorKey: toCaughtErrorKey(error) };
-  }
+): Promise<Result<null, ContactErrorKey>> =>
+  http.post<null, ContactErrorKey>('/contact', payload, { fallbackKey: 'CONTACT_SUBMIT_FAILED' });
+
+// services/invoice.ts — read + DTO map: http returns the raw DTO, the service maps it
+export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceErrorKey>> => {
+  const res = await http.get<VendorInvoiceDto, InvoiceErrorKey>(`/invoices/${id}`, {
+    fallbackKey: 'INVOICE_FETCH_FAILED',
+    notFoundKey: 'INVOICE_NOT_FOUND',
+  });
+  return res.ok ? { ok: true, data: toInvoice(res.data) } : res;
 };
 ```
 
-- **Never throw to the UI** — return `{ ok: false, errorKey }`.
-- **Every fetch gets `AbortSignal.timeout`**; combine with caller signal via `AbortSignal.any([…])` when passed.
-- **Writes around tab close**: `keepalive: true` on fire-and-forget flushes only — never on reads.
+- **Never throw to the UI** — return `{ ok: false, errorKey }`. The client already does this; a service that maps a DTO just forwards `res` on failure.
+- **Timeout, auth headers, and status→`errorKey` mapping live in the client** — pass `signal` for caller cancellation, `notFoundKey` for a 404 reason key.
+- **Writes around tab close**: pass `keepalive: true` in the options on fire-and-forget flushes only — never on reads.
+- **Untrusted boundary**: `schema.safeParse(res.data)` in the service before mapping; the client stays generic.
+- A service that must call a **raw vendor SDK** (not HTTP) keeps its own `try/catch` with `toCaughtErrorKey` — the `http` client is for fetch.
 
 ## 5. Schema at the boundary
 
@@ -112,6 +111,7 @@ actions/submit-contact.ts     # 'use server' thin shell (if needed)
 lib/contact-schema.ts         # zod + mappers — tested
 constants/error-keys.ts       # ContactErrorKey union
 types/result.ts               # shared Result (repo-level, once)
+lib/http.ts                   # shared fetch client (repo-level, once)
 lib/error-keys.ts             # toErrorKey, toCaughtErrorKey (repo-level, once)
 ```
 
@@ -120,6 +120,7 @@ Kebab-case filenames, named exports, no barrel `index.ts`.
 ## 8. Verify
 
 - Service returns `Result<T, K>` with `K` narrowed to this operation's keys — foreign key is a type error at call sites.
+- No raw `fetch` / headers / `AbortSignal.timeout` in the service — it goes through the shared `http` client (raw-SDK services excepted).
 - No vendor DTO types imported outside the service file.
 - No thrown errors cross the UI boundary; `'Error in <fn>::'` logging on every catch.
 - Pure mappers in `lib/` have tests; typecheck and lint pass.

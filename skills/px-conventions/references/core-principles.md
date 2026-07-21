@@ -13,6 +13,17 @@ These conventions describe a **house style**, not a mandate to reshape every pro
 
 When a convention says "match the repo" or "the project's …", that overrides any example path or tool named here.
 
+## Plan the change — in a large repo, planning *is* discovery
+
+The bigger the codebase, the more the plan is a search, not a sketch. The expensive mistake at scale is re-inventing a shared layer that already lives three folders over — the fourth bespoke fetch wrapper, a second date formatter, a parallel error-key union. Before writing, locate:
+
+- **The shared layers already in place** — the `http` client, `Result` + error-key union, data models / view builders, `format*` helpers, typed `env`. Reuse them; grep the alias, the type name, the endpoint. A second copy is the duplication that makes large repos rot.
+- **The right home and the nearest sibling** — which feature owns this, and who already does something similar. Extend their pattern; do not parallel-invent. Colocate first, package only on a second consumer ([structure.md](structure.md)).
+- **The blast radius** — if the change touches shared code, list its consumers first (grep the import path) and confirm the contract still holds for each before editing.
+- **The steps** — break the work into surgical, independently verifiable changes, each tracing to the task; state the plan and confirm before coding.
+
+In a small repo you hold all of this in your head; in a large one, skipping the discovery is exactly how the duplication got there.
+
 ## Working style
 
 - **Be concise** in all interactions and commit messages.

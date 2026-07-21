@@ -20,11 +20,11 @@ export type ErrorKey = UploadErrorKey | InvoiceErrorKey;
 
 - **Name the reason when you know it; the operation only as the catch-all.** `INVOICE_NOT_FOUND` when the API 404s; `INVOICE_FETCH_FAILED` only for "server said no and we don't know why". No `_FAILED` on reason keys — every error is a failure, so the suffix adds nothing — and reason keys are what make copy actionable ("that file is too large" beats "something went wrong").
 - Keys are a **wire contract**, deliberately decoupled from any translation-file layout — reorganizing dictionaries never changes a key.
-- Services, actions, and hooks return `{ ok: false, errorKey }` — never a human-readable message, never a raw `Error`. `Result` is **generic over the keys the operation can actually produce**, so call sites handle its failures exhaustively and a foreign key is a type error (the default keeps un-narrowed signatures compiling):
+- Services, actions, and hooks return `{ ok: false, errorKey }` — never a human-readable message, never a raw `Error`. `Result` is **generic over the keys the operation can actually produce**, so call sites handle its failures exhaustively and a foreign key is a type error (the default keeps un-narrowed signatures compiling). The parameter is `K extends string` (defaulting to `ErrorKey`), not `K extends ErrorKey`: the container itself stays usable by shared utilities and packaged features with their own keys — each operation's declared `Result<T, FooErrorKey>` is what actually narrows them:
 
 ```ts
 // types/result.ts — the one shared definition, imported everywhere
-export type Result<T, K extends ErrorKey = ErrorKey> =
+export type Result<T, K extends string = ErrorKey> =
   | { ok: true; data: T }
   | { ok: false; errorKey: K; meta?: Record<string, string | number> };
 
@@ -60,8 +60,10 @@ export const errorCopy: Record<ErrorKey, string> = {
 Two mappings every service needs, defined once in `lib/error-keys.ts`, never inlined per service:
 
 ```ts
-// HTTP status → shared keys, operation key as fallback — 401/404/429 never collapse into the catch-all
-export const toErrorKey = <K extends ErrorKey>(response: Response, fallback: K, notFound?: K): SharedErrorKey | K => {
+// HTTP status → shared keys, operation key as fallback — 401/404/429 never collapse into the catch-all.
+// K is `extends string`, never the app-wide ErrorKey union, so this shared helper (and the http client
+// built on it) stays a generic utility a packaged feature can call with its own keys.
+export const toErrorKey = <K extends string>(response: Response, fallback: K, notFound?: K): SharedErrorKey | K => {
   if (response.status === 401) return 'UNAUTHORIZED';
   if (response.status === 404 && notFound) return notFound;
   if (response.status === 429) return 'RATE_LIMITED';
@@ -101,6 +103,8 @@ export const fetchInvoice = async (id: string): Promise<Result<Invoice, InvoiceE
   }
 };
 ```
+
+For `fetch` calls this whole shape lives **once** in the shared `http` client, not in each service (see [services.md](services.md)) — the block above is what the client does internally, and a real `fetchInvoice` is just `http.get(...)` plus the DTO map. Write it out by hand only in a service wrapping a raw non-HTTP SDK.
 
 ## Narrow before reading
 
